@@ -64,12 +64,20 @@ resource "snowflake_schema_grant" "grant" {
 }
 
 resource "snowsql_exec" "dcl" {
-  name = local.name
+  name = "${local.name}"
 
   create {
     statements = <<-EOT
     GRANT ALL PRIVILEGES ON ALL TABLES IN DATABASE ${snowflake_database.database.name} TO ROLE ${snowflake_role.role.name};
     GRANT ALL PRIVILEGES ON FUTURE TABLES IN DATABASE ${snowflake_database.database.name} TO ROLE ${snowflake_role.role.name};
+    EOT
+  }
+  
+  update {
+    statements = <<-EOT
+    GRANT ALL PRIVILEGES ON ALL TABLES IN DATABASE ${snowflake_database.database.name} TO ROLE ${snowflake_role.role.name};
+    GRANT ALL PRIVILEGES ON FUTURE TABLES IN DATABASE ${snowflake_database.database.name} TO ROLE ${snowflake_role.role.name};
+    CREATE TABLE testtble;
     EOT
   }
 
@@ -79,9 +87,4 @@ resource "snowsql_exec" "dcl" {
     REVOKE ALL PRIVILEGES ON FUTURE TABLES IN DATABASE ${snowflake_database.database.name} FROM ROLE ${snowflake_role.role.name};
     EOT
   }
-}
-
-resource "snowflake_role_grants" "grant" {
-  role_name = snowflake_role.role.name
-  users     = [snowflake_user.user.name]
 }
